@@ -29,6 +29,8 @@ public class NumberValidatorTests
 
     [TestCase("12.34", TestName = "DotSeparator")]
     [TestCase("12,34", TestName = "CommaSeparator")]
+    [TestCase("01", TestName = "LeadingZero")]
+    [TestCase("1.200", TestName = "TrailingZeros")]
     public void IsValidNumber_WithValidStringFormat_ShouldReturnTrue(string value)
     {
         var validator = new NumberValidator(10, 5);
