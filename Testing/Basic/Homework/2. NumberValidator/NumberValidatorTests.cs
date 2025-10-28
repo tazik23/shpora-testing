@@ -81,4 +81,16 @@ public class NumberValidatorTests
 
         result.Should().BeFalse();
     }
+    
+    [TestCase("-1234", TestName = "NegativeInteger")]
+    [TestCase("-1.23", TestName = "NegativeWithFraction")]
+    [TestCase("-0", TestName = "NegativeZero")]
+    public void IsValidNumber_OnlyPositiveWithNegativeNumber_ShouldReturnFalse(string value)
+    {
+        var validator = new NumberValidator(5, 2, true);
+        
+        var result = validator.IsValidNumber(value);
+        
+        result.Should().BeFalse();
+    }
 }
