@@ -61,6 +61,7 @@ public class NumberValidatorTests
     [TestCase("12.3", 4, 2, TestName = "LessThanMaximumPrecision")]
     [TestCase("1234", 4, 0, TestName = "IntegerExactScale")]
     [TestCase("123.456", 6, 3, TestName = "FractionExactScale")]
+    [TestCase("-123.45", 6, 3, TestName = "Negative")]
     public void IsValidNumber_WithinPrecisionAndScaleLimits_ShouldReturnTrue(string value, int precision, int scale)
     {
         var validator = new NumberValidator(precision, scale);
