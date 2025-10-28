@@ -26,5 +26,32 @@ public class NumberValidatorTests
 
         act.Should().Throw<ArgumentException>();
     }
-
+    
+    [TestCase("12.34", TestName = "DotSeparator")]
+    [TestCase("12,34", TestName = "CommaSeparator")]
+    public void IsValidNumber_WithValidStringFormat_ShouldReturnTrue(string value)
+    {
+        var validator = new NumberValidator(10, 5);
+        
+        var result = validator.IsValidNumber(value);
+        
+        result.Should().BeTrue();
+    }
+    
+    [TestCase("", TestName = "EmptyString")]
+    [TestCase(null, TestName = "NullString")]
+    [TestCase(" ", TestName = "WhiteSpaceString")]
+    [TestCase("a.sd", TestName = "NotNumber")]
+    [TestCase("12..34", TestName = "MultipleSeparators")]
+    [TestCase("++12.34", TestName = "MultipleSigns")]
+    [TestCase("12.", TestName = "FractionPartIsMissing")]
+    [TestCase(".34", TestName = "IntegerPartIsMissing")]
+    public void IsValidNumber_WithInvalidStringFormat_ShouldReturnFalse(string value)
+    {
+        var validator = new NumberValidator(10, 5);
+        
+        var result = validator.IsValidNumber(value);
+        
+        result.Should().BeFalse();
+    }
 }
