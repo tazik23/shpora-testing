@@ -14,30 +14,30 @@ public class NumberValidatorTests
 
         act.Should().NotThrow();
     }
-    
+
     [TestCase(-1, 2, TestName = "NegativePrecision")]
     [TestCase(0, 1, TestName = "ZeroPrecision")]
     [TestCase(1, -1, TestName = "NegativeScale")]
     [TestCase(3, 4, TestName = "ScaleGreaterThanPrecision")]
     [TestCase(3, 3, TestName = "ScaleEqualsPrecision")]
-    public void Ctor_WithInvalidParameters_ShouldThrow(int precision, int scale)    
+    public void Ctor_WithInvalidParameters_ShouldThrow(int precision, int scale)
     {
         var act = () => new NumberValidator(precision, scale);
 
         act.Should().Throw<ArgumentException>();
     }
-    
+
     [TestCase("12.34", TestName = "DotSeparator")]
     [TestCase("12,34", TestName = "CommaSeparator")]
     public void IsValidNumber_WithValidStringFormat_ShouldReturnTrue(string value)
     {
         var validator = new NumberValidator(10, 5);
-        
+
         var result = validator.IsValidNumber(value);
-        
+
         result.Should().BeTrue();
     }
-    
+
     [TestCase("", TestName = "EmptyString")]
     [TestCase(null, TestName = "NullString")]
     [TestCase(" ", TestName = "WhiteSpaceString")]
@@ -49,9 +49,36 @@ public class NumberValidatorTests
     public void IsValidNumber_WithInvalidStringFormat_ShouldReturnFalse(string value)
     {
         var validator = new NumberValidator(10, 5);
-        
+
         var result = validator.IsValidNumber(value);
-        
+
+        result.Should().BeFalse();
+    }
+
+    [TestCase("12.34", 4, 2, TestName = "ExactPrecisionAndScale")]
+    [TestCase("12.3", 4, 2, TestName = "LessThanMaximumPrecision")]
+    [TestCase("1234", 4, 0, TestName = "IntegerExactScale")]
+    [TestCase("123.456", 6, 3, TestName = "FractionExactScale")]
+    public void IsValidNumber_WithinPrecisionAndScaleLimits_ShouldReturnTrue(string value, int precision, int scale)
+    {
+        var validator = new NumberValidator(precision, scale);
+
+        var result = validator.IsValidNumber(value);
+
+        result.Should().BeTrue();
+    }
+
+    [TestCase("123.45", 4, 2, TestName = "TotalDigitsExceedLimits")]
+    [TestCase("123456", 5, 0, TestName = "IntegerExceedsLimits")]
+    [TestCase("12.34", 4, 1, TestName = "FractionPartExceedsLimits")]
+    [TestCase("+0.00", 3, 2, TestName = "MinusSignExceedsLimits")]
+    [TestCase("+00.0", 3, 2, TestName = "PlusSignExceedsLimits")]
+    public void IsValidNumber_ExceedsPrecisionAndScaleLimits_ShouldReturnFalse(string value, int precision, int scale)
+    {
+        var validator = new NumberValidator(precision, scale);
+
+        var result = validator.IsValidNumber(value);
+
         result.Should().BeFalse();
     }
 }
