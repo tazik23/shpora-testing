@@ -48,6 +48,7 @@ public class NumberValidatorTests
     [TestCase("++12.34", TestName = "MultipleSigns")]
     [TestCase("12.", TestName = "FractionPartIsMissing")]
     [TestCase(".34", TestName = "IntegerPartIsMissing")]
+    [TestCase("1ab.3", TestName = "DigitsAndLetters")]
     public void IsValidNumber_WithInvalidStringFormat_ShouldReturnFalse(string value)
     {
         var validator = new NumberValidator(10, 5);
