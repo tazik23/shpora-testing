@@ -1,13 +1,14 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
+
 public class ObjectComparison
 {
+    
+    
+    
     [Test]
-    [Description("Проверка текущего царя")]
-    [Category("ToRefactor")]
     public void CheckCurrentTsar()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
@@ -16,40 +17,55 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         actualTsar.Should().BeEquivalentTo(expectedTsar, o => o
-            .Excluding(p => p.Id)
-            .Excluding(p => p.Parent.Id));
+            .ExcludingMembersNamed(nameof(Person.Id))
+            .IgnoringCyclicReferences());
     }
 
     [Test]
-    [Description("Альтернативное решение. Какие у него недостатки?")]
-    public void CheckCurrentTsar_WithCustomEquality()
+    public void CheckCurrentTsarWithCyclicDependency()
+    {
+        var actualTsar = TsarRegistry.GetCurrentTsarWithCyclicDependency();
+        
+        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70, null);
+        var expectedParent = new Person("Vasili III of Russia", 28, 170, 60, expectedTsar);
+        expectedTsar.Parent = expectedParent;
+
+        actualTsar.Should().BeEquivalentTo(expectedTsar, o => o
+            .ExcludingMembersNamed(nameof(Person.Id))
+            .IgnoringCyclicReferences());
+    }
+
+    [Test]
+    public void CheckCurrentTsar_WhenParentNullInOneObject()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Какие недостатки у такого подхода? 
-        ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
+        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70, null);
+        
+        var act = () => actualTsar.Should().BeEquivalentTo(expectedTsar, o => o
+            .ExcludingMembersNamed(nameof(Person.Id))
+            .IgnoringCyclicReferences());
+        
+        act.Should().Throw<AssertionException>();
     }
-
-    private bool AreEqual(Person? actual, Person? expected)
+    
+    [Test]
+    public void CheckCurrentTsar_WithDifferentAncestorChains_ShouldFail()
     {
-        if (actual == expected) return true;
-        if (actual == null || expected == null) return false;
-        return
-            actual.Name == expected.Name
-            && actual.Age == expected.Age
-            && actual.Height == expected.Height
-            && actual.Weight == expected.Weight
-            && AreEqual(actual.Parent, expected.Parent);
-    }
-}
+        var actualFather = new Person("Vasili III of Russia", 28, 170, 60, 
+            new Person("Ivan III", 65, 175, 80, null));
+        
+        var actualTsar = new Person("Ivan IV The Terrible", 54, 170, 70, actualFather);
 
-/*
- * Что хорошо в решении:
- * 1.) Тест легче читать: 3 строчки vs найти метод, залезть в него и посмотреть: а что он там делает
- * 2.) Явно указываем, какие поля мы исключаем из проверки
- * 3.) При добавлении новых полей в Person нужно провести минимальный рефакторинг(исключить из проверки
- *     или вообще ничего не трогать)
- * 4.) Падаем с адекватной информацией об ошибке, в отличие от просто непонятного False
-*/
+        var expectedFather = new Person("Vasili III of Russia", 28, 170, 60, 
+            new Person("Different Ancestor", 65, 175, 80, null)); 
+        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70, expectedFather);
+        
+        var act = () => actualTsar.Should().BeEquivalentTo(expectedTsar, o => o
+            .ExcludingMembersNamed(nameof(Person.Id))
+            .IgnoringCyclicReferences());
+        
+        act.Should().Throw<AssertionException>();
+    }
+
+}
