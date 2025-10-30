@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
+using HomeExercise.Tasks.ObjectComparison;
 using NUnit.Framework;
 
-namespace HomeExercise.Tasks.ObjectComparison;
+namespace HomeExercise.Tasks.TsarTests;
 
-public class ObjectComparison
+public class TsarTests
 {
     private static void CheckTsarEquality(Person actualTsar, Person expectedTsar)
     {
