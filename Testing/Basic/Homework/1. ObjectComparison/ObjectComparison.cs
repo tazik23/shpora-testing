@@ -9,7 +9,8 @@ public class ObjectComparison
     {
         actualTsar.Should().BeEquivalentTo(expectedTsar, o => o
             .ExcludingMembersNamed(nameof(Person.Id))
-            .IgnoringCyclicReferences());
+            .IgnoringCyclicReferences()
+            .AllowingInfiniteRecursion());
     }
     
     [Test]
@@ -64,6 +65,7 @@ public class ObjectComparison
     [TestCase(5, 3, TestName = "WrongAncestorInMiddleOfChain")]
     [TestCase(5, 1, TestName = "WrongAncestorAtStartOfChain")]
     [TestCase(5, 5, TestName = "WrongAncestorAtEndOfChain")]
+    [TestCase(100, 50, TestName = "WrongAncestorLongChain")]
     public void CheckTsarEquality_WithWrongAncestorInChain_ShouldThrow(int generations, int wrongAncestorLevel)
     {
         var actualTsar = TsarRegistry.GetCurrentTsarWithAncestryChain(generations);
