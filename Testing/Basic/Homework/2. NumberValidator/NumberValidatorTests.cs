@@ -7,7 +7,7 @@ namespace HomeExercise.Tasks.NumberValidator;
 public class NumberValidatorTests
 {
     private const string precisionExceptionMessage = "precision must be a positive number";
-    private const string scaleExceptionMessage = "scale must be a non-negative number less or equal than precision";
+    private const string scaleExceptionMessage = "scale must be a non-negative number less than precision";
     
     [TestCase(1, 0, TestName = "PositivePrecision_ScaleIsZero")]
     [TestCase(2, 1, TestName = "PositivePrecisionAndScale_ScaleLessThanPrecision")]
