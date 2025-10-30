@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -14,16 +15,9 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar, o => o
+            .Excluding(p => p.Id)
+            .Excluding(p => p.Parent.Id));
     }
 
     [Test]
@@ -50,3 +44,12 @@ public class ObjectComparison
             && AreEqual(actual.Parent, expected.Parent);
     }
 }
+
+/*
+ * Что хорошо в решении:
+ * 1.) Тест легче читать: 3 строчки vs найти метод, залезть в него и посмотреть: а что он там делает
+ * 2.) Явно указываем, какие поля мы исключаем из проверки
+ * 3.) При добавлении новых полей в Person нужно провести минимальный рефакторинг(исключить из проверки
+ *     или вообще ничего не трогать)
+ * 4.) Падаем с адекватной информацией об ошибке, в отличие от просто непонятного False
+*/
