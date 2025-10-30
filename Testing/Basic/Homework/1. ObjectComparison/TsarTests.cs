@@ -70,29 +70,10 @@ public class TsarTests
     public void CheckTsarEquality_WithWrongAncestorInChain_ShouldThrow(int generations, int wrongAncestorLevel)
     {
         var actualTsar = TsarRegistry.GetCurrentTsarWithAncestryChain(generations);
-        var expectedTsar = CreateTsarWithWrongAncestor(generations, wrongAncestorLevel);
+        var expectedTsar = TsarRegistry.GetTsarWithWrongAncestor(generations, wrongAncestorLevel);
 
         var act = () => CheckTsarEquality(actualTsar, expectedTsar);
 
         act.Should().Throw<AssertionException>();
-    }
-
-    private static Person CreateTsarWithWrongAncestor(int generations, int wrongAncestorLevel)
-    {
-        Person current = null!;
-        
-        for (int i = generations; i > 0; i--)
-        {
-            current = new Person($"Ancestor {i}", 40 + i * 5, 170 + i, 65 + i, current);
-            
-            if (i == wrongAncestorLevel)
-            {
-                current.Name = "Imposter";
-            }
-        }
-        
-        var tsar = new Person("Ivan IV The Terrible", 54, 170, 70, current);
-    
-        return tsar;
     }
 }
