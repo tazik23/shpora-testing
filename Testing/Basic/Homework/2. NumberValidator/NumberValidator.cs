@@ -4,9 +4,8 @@ namespace HomeExercise.Tasks.NumberValidator;
 
 public class NumberValidator
 {
-    private static readonly Regex NumberRegex = new Regex(@"^([+-]?)(\d+)([.,](\d+))?$", 
-        RegexOptions.Compiled | RegexOptions.IgnoreCase
-    );
+    private static readonly Regex NumberRegex = 
+        new Regex(@"^([+-]?)(\d+)([.,](\d+))?$", RegexOptions.Compiled);
     
     private readonly bool onlyPositive;
     private readonly int precision;
