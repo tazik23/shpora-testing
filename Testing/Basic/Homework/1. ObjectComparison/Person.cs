@@ -1,4 +1,6 @@
-﻿namespace HomeExercise.Tasks.ObjectComparison;
+﻿using Basic.Homework._1._ObjectComparison;
+
+namespace HomeExercise.Tasks.ObjectComparison;
 
 
 public class Person
@@ -8,8 +10,9 @@ public class Person
     public string Name;
     public Person Parent;
     public int Id;
+    public City City;
 
-    public Person(string name, int age, int height, int weight, Person parent)
+    public Person(string name, int age, int height, int weight, Person parent, City city)
     {
         Id = IdCounter++;
         Name = name;
@@ -17,5 +20,6 @@ public class Person
         Height = height;
         Weight = weight;
         Parent = parent;
+        City = city;
     }
 }

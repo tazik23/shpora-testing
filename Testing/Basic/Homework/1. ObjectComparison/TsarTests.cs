@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using Basic.Homework._1._ObjectComparison;
+using FluentAssertions;
 using HomeExercise.Tasks.ObjectComparison;
 using NUnit.Framework;
 
@@ -9,7 +10,7 @@ public class TsarTests
     private static void CheckTsarEquality(Person actualTsar, Person expectedTsar)
     {
         actualTsar.Should().BeEquivalentTo(expectedTsar, o => o
-            .ExcludingMembersNamed(nameof(Person.Id))
+            .Excluding(m => m.Name.Equals(nameof(Person.Id)) && m.DeclaringType == typeof(Person))
             .IgnoringCyclicReferences()
             .AllowingInfiniteRecursion());
     }
@@ -19,7 +20,8 @@ public class TsarTests
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
+            new Person("Vasili III of Russia", 28, 170, 60, null, new City(1, "Peterburg")),
+            new City(1, "Peterburg"));
         
         var act = () => CheckTsarEquality(actualTsar, expectedTsar);
         
@@ -31,8 +33,10 @@ public class TsarTests
     {
         var actualTsar = TsarRegistry.GetCurrentTsarWithCyclicDependency();
         
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70, null);
-        var expectedParent = new Person("Vasili III of Russia", 28, 170, 60, expectedTsar);
+        var expectedTsar =
+            new Person("Ivan IV The Terrible", 54, 170, 70, null, new City(1, "Peterburg"));
+        var expectedParent =
+            new Person("Vasili III of Russia", 28, 170, 60, expectedTsar, new City(1, "Peterburg"));
         expectedTsar.Parent = expectedParent;
 
         var act = () => CheckTsarEquality(actualTsar, expectedTsar);
@@ -44,7 +48,8 @@ public class TsarTests
     public void CheckTsarEquality_WithParentNullInOneObject_ShouldThrow()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70, null);
+        var expectedTsar =
+            new Person("Ivan IV The Terrible", 54, 170, 70, null, new City(1, "Peterburg"));
         
         var act = () => CheckTsarEquality(actualTsar, expectedTsar);
         
@@ -76,6 +81,20 @@ public class TsarTests
 
         act.Should().Throw<AssertionException>();
     }
+    
+    [Test]
+    public void CheckTsarEquality_WithDifferentCityIds_ShouldThrow()
+    {
+        var actualTsar = TsarRegistry.GetCurrentTsar();
+        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
+            new Person("Vasili III of Russia", 28, 170, 60, null, new City(2, "Peterburg")),
+            new City(1, "Peterburg"));
+        
+        var act = () => CheckTsarEquality(actualTsar, expectedTsar);
+        
+        act.Should().Throw<AssertionException>();
+    }
+    
 }
 
 /*
