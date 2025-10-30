@@ -95,6 +95,20 @@ public class TsarTests
         act.Should().Throw<AssertionException>();
     }
     
+    [Test]
+    public void CheckTsarEquality_WithDifferentIds_ShouldThrow()
+    {
+        var actualTsar = TsarRegistry.GetCurrentTsar();
+        
+        var expectedTsar = TsarRegistry.GetCurrentTsar();
+        expectedTsar.Id = 2;
+        expectedTsar.City = new City(2, "Peterburg");
+        
+        var act = () => CheckTsarEquality(actualTsar, expectedTsar);
+        
+        act.Should().Throw<AssertionException>();
+    }
+    
 }
 
 /*
